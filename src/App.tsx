@@ -1,14 +1,34 @@
-import { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from './firebase/config';
-import { useAuthStore } from './store/authStore';
-import Login from './pages/Login';
+import { useEffect } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "./firebase/config";
+import { useAuthStore } from "./store/authStore";
+import Login from "./pages/login";
+import Register from "./pages/register";
+import LandingPage from "./pages/landingPage";
+import Home from "./pages/printData";
 
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user } = useAuthStore();
-  return user ? <>{children}</> : <Navigate to="/login" />;
+const ProtectedRoute = ({
+  children,
+  adminOnly = false,
+}: {
+  children: React.ReactNode;
+  adminOnly?: boolean;
+}) => {
+  const { user, userData } = useAuthStore();
+
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
+
+  if (adminOnly && userData?.role !== "admin") {
+    return <Navigate to="/printData" />;
+  }
+
+  return <>{children}</>;
 };
+
+
 
 function App() {
   const { setUser } = useAuthStore();
@@ -24,16 +44,25 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route
-          path="/dashboard"
+          path="/printData"
           element={
             <ProtectedRoute>
-              <div>Dashboard (Coming soon)</div>
+              <Home />
             </ProtectedRoute>
           }
         />
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute adminOnly>
+              <div>Admin Dashboard (Coming soon)</div>
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

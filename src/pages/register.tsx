@@ -1,23 +1,23 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Lock, Mail } from "lucide-react";
+import { Lock, Mail} from "lucide-react";
 import { useAuthStore } from "../store/authStore";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 
-export default function Login() {
+export default function Register() {
   const navigate = useNavigate();
-  const { signIn, loading, error } = useAuthStore();
+  const { signUp, loading, error } = useAuthStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      await signIn(email, password);
+      await signUp(email, password);
       navigate("/printData");
     } catch (error) {
-      console.error("Login failed:", error);
+      console.error("Registration failed:", error);
     }
   };
 
@@ -26,15 +26,15 @@ export default function Login() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
+            Create your account
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Or{" "}
             <button
-              onClick={() => navigate("/register")}
+              onClick={() => navigate("/login")}
               className="font-medium text-blue-600 hover:text-blue-500"
             >
-              create a new account
+              sign in to your account
             </button>
           </p>
         </div>
@@ -69,7 +69,7 @@ export default function Login() {
           )}
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Signing in..." : "Sign in"}
+            {loading ? "Creating account..." : "Create account"}
           </Button>
         </form>
       </div>
