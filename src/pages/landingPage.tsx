@@ -14,7 +14,7 @@ const LandingPage = () => {
         Selamat Datang di e-Card Generator
       </h1>
       <p className="text-lg max-w-3xl mb-8 drop-shadow-lg">
-        Buat e-Card Anda dengan mudah! Login mengakses fiturnya..
+        Buat e-Card Anda dengan mudah! Login untuk mengakses fiturnya..
       </p>
       <div className="flex flex-wrap gap-4">
         <Link
