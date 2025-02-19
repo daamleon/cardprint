@@ -4,10 +4,10 @@ const Hero = () => {
   return (
     <section className="flex flex-col justify-center min-h-screen">
       <div className="place-items-center">
-        <h1 className="text-5xl font-extrabold mb-6 drop-shadow-lg">
+        <h1 className="text-2xl md:text-3xl lg:text-5xl font-extrabold mb-4 drop-shadow-lg text-center">
           Selamat Datang di e-Card Generator
         </h1>
-        <p className="text-lg max-w-3xl mb-8 drop-shadow-lg">
+        <p className="text-sm md:text-lg lg:text-xl max-w-3xl mb-8 drop-shadow-lg text-center px-4">
           Buat e-Card Anda dengan mudah! Login untuk mengakses fiturnya.
         </p>
         <div className="flex flex-wrap gap-4 justify-center">
