@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase/config";
 import { useAuthStore } from "./store/authStore";
-import Login from "./pages/Login";
+import Login from "./pages/login";
 import Register from "./pages/register";
 import LandingPage from "./pages/landingPage";
 import Home from "./pages/mainMenu";
