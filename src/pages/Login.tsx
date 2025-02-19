@@ -15,7 +15,7 @@ export default function Login() {
     e.preventDefault();
     try {
       await signIn(email, password);
-      navigate("/printData");
+      navigate("/mainMenu");
     } catch (error) {
       console.error("Login failed:", error);
     }
@@ -41,7 +41,7 @@ export default function Login() {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <Mail className="absolute left-3 top-2/3 -translate-y-1/2 text-gray-400 h-5 w-5" />
               <Input
                 label="Email address"
                 type="email"
@@ -52,7 +52,7 @@ export default function Login() {
               />
             </div>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <Lock className="absolute left-3 top-2/3 -translate-y-1/2 text-gray-400 h-5 w-5" />
               <Input
                 label="Password"
                 type="password"

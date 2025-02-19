@@ -12,7 +12,7 @@ import { auth, db } from "../firebase/config";
 interface UserData {
   role: "admin" | "user";
   email: string;
-  createdAt: any; // Using any for Firebase Timestamp
+  createdAt: any;
 }
 
 interface AuthState {
@@ -28,7 +28,6 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>((set, get) => {
-  // Set up auth state listener
   onAuthStateChanged(auth, (user) => {
     if (!get().initialized) {
       set({ initialized: true });

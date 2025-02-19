@@ -7,9 +7,10 @@ const LandingPage = () => {
         className="absolute top-0 left-0 w-full h-full bg-cover bg-center opacity-20"
         style={{
           backgroundImage:
-            "url('https://source.unsplash.com/1600x900/?technology')",
+            'url("https://images.unsplash.com/photo-1593642634315-48f5414c3ad9")',
         }}
       ></div>
+
       <h1 className="text-5xl font-extrabold mb-6 drop-shadow-lg">
         Selamat Datang di e-Card Generator
       </h1>

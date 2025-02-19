@@ -3,10 +3,10 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase/config";
 import { useAuthStore } from "./store/authStore";
-import Login from "./pages/login";
+import Login from "./pages/Login";
 import Register from "./pages/register";
 import LandingPage from "./pages/landingPage";
-import Home from "./pages/printData";
+import Home from "./pages/mainMenu";
 
 const ProtectedRoute = ({
   children,
@@ -22,7 +22,7 @@ const ProtectedRoute = ({
   }
 
   if (adminOnly && userData?.role !== "admin") {
-    return <Navigate to="/printData" />;
+    return <Navigate to="/mainMenu" />;
   }
 
   return <>{children}</>;
@@ -48,7 +48,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route
-          path="/printData"
+          path="/mainMenu"
           element={
             <ProtectedRoute>
               <Home />
