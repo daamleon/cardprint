@@ -2,19 +2,11 @@
 
 CardPrint is a web-based application that allows users to create and print custom e-cards easily.  
 
-## 📌 Features  
+## 📌 Features  (upcoming)
 ✅ Generate customizable e-cards  
 ✅ Print and download your e-card  
 ✅ Firebase authentication and database  
 ✅ Modern UI built with React and TailwindCSS  
-
----
-
-## 🛠️ Tech Stack  
-
-<p align="left">
-  <img src="https://skillicons.dev/icons?i=js,ts,react,vite,tailwind,firebase,git" />
-</p>
 
 ---
 
