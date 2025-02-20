@@ -5,7 +5,7 @@ import {
   signOut as firebaseSignOut,
 } from "firebase/auth";
 import { auth, db } from "../firebase/config";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 
 interface AuthState {
   user: any;
@@ -41,7 +41,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
       set({ user, userData, loading: false });
 
-      return { email: user.email, role: userData?.role || "user" };
+      return userData;
     } catch (error: any) {
       set({ error: error.message, loading: false });
       throw error;
@@ -58,16 +58,19 @@ export const useAuthStore = create<AuthState>((set) => ({
         password
       );
       const user = userCredential.user;
-      const role = email === "admin@example.com" ? "admin" : "user";
 
-      await setDoc(doc(db, "users", user.uid), {
-        email: user.email,
-        role,
-      });
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      const userData = userDoc.exists() ? userDoc.data() : null;
 
-      set({ user, userData: { email: user.email, role }, loading: false });
+      if (!userData) {
+        throw new Error(
+          "User data not found in Firestore. Please check database."
+        );
+      }
 
-      return { email: user.email, role };
+      set({ user, userData, loading: false });
+
+      return userData;
     } catch (error: any) {
       set({ error: error.message, loading: false });
       throw error;
