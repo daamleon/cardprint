@@ -14,8 +14,13 @@ export default function Login() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      await signIn(email, password);
-      navigate("/mainMenu");
+      const user = await signIn(email, password); // Pastikan signIn mengembalikan email & role
+
+      if (user?.role === "admin") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/user/dashboard");
+      }
     } catch (error) {
       console.error("Login failed:", error);
     }

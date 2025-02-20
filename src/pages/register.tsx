@@ -1,6 +1,6 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Lock, Mail} from "lucide-react";
+import { Lock, Mail } from "lucide-react";
 import { useAuthStore } from "../store/authStore";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
@@ -14,8 +14,13 @@ export default function Register() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      await signUp(email, password);
-      navigate("/printData");
+      const user = await signUp(email, password);
+
+      if (user?.role === "admin") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/user/dashboard");
+      }
     } catch (error) {
       console.error("Registration failed:", error);
     }

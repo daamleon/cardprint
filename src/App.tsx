@@ -1,12 +1,14 @@
 import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "./firebase/config";
+import { auth, db } from "./firebase/config";
 import { useAuthStore } from "./store/authStore";
+import { doc, getDoc } from "firebase/firestore";
 import Login from "./pages/login";
 import Register from "./pages/register";
-import LandingPage from "./pages/landingPage";
-import Home from "./pages/mainMenu";
+import LandingPage from "./pages/home";
+import Home from "./pages/user/dashboard";
+import AdminDashboard from "./pages/admin/dashboard";
 
 const ProtectedRoute = ({
   children,
@@ -22,24 +24,33 @@ const ProtectedRoute = ({
   }
 
   if (adminOnly && userData?.role !== "admin") {
-    return <Navigate to="/mainMenu" />;
+    return <Navigate to="/user/dashboard" />;
   }
 
   return <>{children}</>;
 };
 
-
-
 function App() {
-  const { setUser } = useAuthStore();
+  const { setUser, setUserData } = useAuthStore();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        setUser(user);
+
+        // Ambil data pengguna dari Firestore
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        const userData = userDoc.exists() ? userDoc.data() : null;
+
+        setUserData(userData);
+      } else {
+        setUser(null);
+        setUserData(null);
+      }
     });
 
     return () => unsubscribe();
-  }, [setUser]);
+  }, [setUser, setUserData]);
 
   return (
     <BrowserRouter>
@@ -48,7 +59,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route
-          path="/mainMenu"
+          path="/user/dashboard"
           element={
             <ProtectedRoute>
               <Home />
@@ -56,10 +67,10 @@ function App() {
           }
         />
         <Route
-          path="/dashboard"
+          path="/admin/dashboard"
           element={
             <ProtectedRoute adminOnly>
-              <div>Admin Dashboard (Coming soon)</div>
+              <AdminDashboard />
             </ProtectedRoute>
           }
         />

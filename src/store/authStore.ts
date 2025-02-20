@@ -1,133 +1,89 @@
 import { create } from "zustand";
 import {
-  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
   signOut as firebaseSignOut,
-  User,
-  onAuthStateChanged,
 } from "firebase/auth";
-import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "../firebase/config";
-
-interface UserData {
-  role: "admin" | "user";
-  email: string;
-  createdAt: any;
-}
+import { doc, setDoc, getDoc } from "firebase/firestore";
 
 interface AuthState {
-  user: User | null;
-  userData: UserData | null;
+  user: any;
+  userData: any;
   loading: boolean;
   error: string | null;
-  initialized: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<any>;
+  signUp: (email: string, password: string) => Promise<any>; // ✅ Tambahkan signUp
   signOut: () => Promise<void>;
-  setUser: (user: User | null) => Promise<void>;
+  setUser: (user: any) => void;
+  setUserData: (userData: any) => void;
 }
 
-export const useAuthStore = create<AuthState>((set, get) => {
-  onAuthStateChanged(auth, (user) => {
-    if (!get().initialized) {
-      set({ initialized: true });
+export const useAuthStore = create<AuthState>((set) => ({
+  user: null,
+  userData: null,
+  loading: false,
+  error: null,
+
+  signIn: async (email, password) => {
+    set({ loading: true, error: null });
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+
+      // Ambil data user dari Firestore
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      const userData = userDoc.exists() ? userDoc.data() : null;
+
+      set({ user, userData, loading: false });
+
+      return { email: user.email, role: userData?.role || "user" };
+    } catch (error: any) {
+      set({ error: error.message, loading: false });
+      throw error;
     }
-    if (user) {
-      get().setUser(user);
-    } else {
-      set({ user: null, userData: null });
+  },
+
+  signUp: async (email, password) => {
+    // ✅ Tambahkan fungsi signUp
+    set({ loading: true, error: null });
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+
+      // Tentukan role berdasarkan email (contoh: admin jika email tertentu)
+      const role = email === "admin@example.com" ? "admin" : "user";
+
+      // Simpan data user ke Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        email: user.email,
+        role,
+      });
+
+      set({ user, userData: { email: user.email, role }, loading: false });
+
+      return { email: user.email, role };
+    } catch (error: any) {
+      set({ error: error.message, loading: false });
+      throw error;
     }
-  });
+  },
 
-  return {
-    user: null,
-    userData: null,
-    loading: false,
-    error: null,
-    initialized: false,
-    signIn: async (email, password) => {
-      set({ loading: true, error: null });
-      try {
-        const userCredential = await signInWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
-        const userDocRef = doc(db, "users", userCredential.user.uid);
-        const userDoc = await getDoc(userDocRef);
+  signOut: async () => {
+    await firebaseSignOut(auth);
+    set({ user: null, userData: null });
+  },
 
-        if (!userDoc.exists()) {
-          const userData: UserData = {
-            role: "user",
-            email,
-            createdAt: serverTimestamp(),
-          };
-          await setDoc(userDocRef, userData);
-          set({ user: userCredential.user, userData, loading: false });
-        } else {
-          const userData = userDoc.data() as UserData;
-          set({ user: userCredential.user, userData, loading: false });
-        }
-      } catch (error) {
-        console.error("Sign in error:", error);
-        set({ error: (error as Error).message, loading: false });
-      }
-    },
-    signUp: async (email, password) => {
-      set({ loading: true, error: null });
-      try {
-        const userCredential = await createUserWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
-        const userData: UserData = {
-          role: "user",
-          email,
-          createdAt: serverTimestamp(),
-        };
-        await setDoc(doc(db, "users", userCredential.user.uid), userData);
-        set({ user: userCredential.user, userData, loading: false });
-      } catch (error) {
-        console.error("Sign up error:", error);
-        set({ error: (error as Error).message, loading: false });
-      }
-    },
-    signOut: async () => {
-      try {
-        await firebaseSignOut(auth);
-        set({ user: null, userData: null });
-      } catch (error) {
-        console.error("Sign out error:", error);
-        set({ error: (error as Error).message });
-      }
-    },
-    setUser: async (user) => {
-      if (!user) {
-        set({ user: null, userData: null });
-        return;
-      }
-
-      try {
-        const userDocRef = doc(db, "users", user.uid);
-        const userDoc = await getDoc(userDocRef);
-
-        if (userDoc.exists()) {
-          const userData = userDoc.data() as UserData;
-          set({ user, userData });
-        } else {
-          const userData: UserData = {
-            role: "user",
-            email: user.email!,
-            createdAt: serverTimestamp(),
-          };
-          await setDoc(userDocRef, userData);
-          set({ user, userData });
-        }
-      } catch (error) {
-        console.error("Error setting user:", error);
-        set({ error: (error as Error).message });
-      }
-    },
-  };
-});
+  setUser: (user) => set({ user }),
+  setUserData: (userData) => set({ userData }),
+}));

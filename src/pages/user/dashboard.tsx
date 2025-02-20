@@ -1,9 +1,10 @@
 import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom"; // Tambahkan useNavigate
 import { useReactToPrint } from "react-to-print";
 import { Mail, Phone, LogOut, Printer } from "lucide-react";
-import { useAuthStore } from "../store/authStore";
-import Button from "../components/ui/Button";
-import Input from "../components/ui/Input";
+import { useAuthStore } from "../../store/authStore";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
 
 interface CardData {
   name: string;
@@ -13,7 +14,8 @@ interface CardData {
   phone: string;
 }
 
-export default function mainMenu() {
+export default function MainMenu() {
+  const navigate = useNavigate(); 
   const { signOut, userData } = useAuthStore();
   const [cardData, setCardData] = useState<CardData>({
     name: "",
@@ -33,6 +35,11 @@ export default function mainMenu() {
     setCardData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/login"); 
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-r from-gray-100 to-gray-300">
       <header className="bg-white shadow-md sticky top-0 z-10">
@@ -47,7 +54,7 @@ export default function mainMenu() {
             <Button
               variant="primary"
               size="sm"
-              onClick={() => signOut()}
+              onClick={handleSignOut}
               className="flex items-center text-black gap-2 bg-transparent border-2 hover:bg-gray-600 hover:text-white"
             >
               <LogOut className="h-4 w-4 text-black" />
