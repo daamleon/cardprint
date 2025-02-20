@@ -38,7 +38,6 @@ function App() {
       if (user) {
         setUser(user);
 
-        // Ambil data pengguna dari Firestore
         const userDoc = await getDoc(doc(db, "users", user.uid));
         const userData = userDoc.exists() ? userDoc.data() : null;
 

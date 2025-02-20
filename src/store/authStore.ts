@@ -13,7 +13,7 @@ interface AuthState {
   loading: boolean;
   error: string | null;
   signIn: (email: string, password: string) => Promise<any>;
-  signUp: (email: string, password: string) => Promise<any>; // ✅ Tambahkan signUp
+  signUp: (email: string, password: string) => Promise<any>;
   signOut: () => Promise<void>;
   setUser: (user: any) => void;
   setUserData: (userData: any) => void;
@@ -36,7 +36,6 @@ export const useAuthStore = create<AuthState>((set) => ({
       );
       const user = userCredential.user;
 
-      // Ambil data user dari Firestore
       const userDoc = await getDoc(doc(db, "users", user.uid));
       const userData = userDoc.exists() ? userDoc.data() : null;
 
@@ -50,7 +49,6 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   signUp: async (email, password) => {
-    // ✅ Tambahkan fungsi signUp
     set({ loading: true, error: null });
 
     try {
@@ -60,11 +58,8 @@ export const useAuthStore = create<AuthState>((set) => ({
         password
       );
       const user = userCredential.user;
-
-      // Tentukan role berdasarkan email (contoh: admin jika email tertentu)
       const role = email === "admin@example.com" ? "admin" : "user";
 
-      // Simpan data user ke Firestore
       await setDoc(doc(db, "users", user.uid), {
         email: user.email,
         role,
